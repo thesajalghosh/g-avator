@@ -1,3 +1,4 @@
+"use client";
 import type { StartAvatarResponse } from "@heygen/streaming-avatar";
 
 import StreamingAvatar, {
@@ -44,6 +45,10 @@ export default function InteractiveAvatar() {
   const avatar = useRef<StreamingAvatar | null>(null);
   const [chatMode, setChatMode] = useState("text_mode");
   const [isUserTalking, setIsUserTalking] = useState(false);
+
+  useEffect(() => {
+    startSession();
+  }, []);
 
   function baseApiUrl() {
     return process.env.NEXT_PUBLIC_BASE_API_URL;
@@ -99,7 +104,7 @@ export default function InteractiveAvatar() {
     try {
       const res = await avatar.current.createStartAvatar({
         quality: AvatarQuality.Low,
-        avatarName: avatarId,
+        avatarName: "6892d4f6f97747ae99c726ab032c1a20",
         knowledgeId: knowledgeId, // Or use a custom `knowledgeBase`.
         voice: {
           rate: 1.5, // 0.5 ~ 1.5
@@ -127,6 +132,7 @@ export default function InteractiveAvatar() {
       setIsLoadingSession(false);
     }
   }
+
   async function handleSpeak() {
     setIsLoadingRepeat(true);
     if (!avatar.current) {
@@ -139,7 +145,7 @@ export default function InteractiveAvatar() {
       .speak({ text: text, taskType: TaskType.REPEAT, taskMode: TaskMode.SYNC })
       .catch((e) => {
         console.log("e.message", e.message);
-        
+
         setDebug(e.message);
       });
     setIsLoadingRepeat(false);
@@ -154,6 +160,7 @@ export default function InteractiveAvatar() {
       setDebug(e.message);
     });
   }
+
   async function endSession() {
     await avatar.current?.stopAvatar();
     setStream(undefined);
@@ -214,7 +221,7 @@ export default function InteractiveAvatar() {
               >
                 <track kind="captions" />
               </video>
-              <div className="flex flex-col gap-2 absolute bottom-3 right-3">
+              {/* <div className="flex flex-col gap-2 absolute bottom-3 right-3">
                 <Button
                   className="bg-gradient-to-tr from-indigo-500 to-indigo-300 text-white rounded-lg"
                   size="md"
@@ -231,65 +238,7 @@ export default function InteractiveAvatar() {
                 >
                   End session
                 </Button>
-              </div>
-            </div>
-          ) : !isLoadingSession ? (
-            <div className="h-full justify-center items-center flex flex-col gap-8 w-[500px] self-center">
-              <div className="flex flex-col gap-2 w-full">
-                <p className="text-sm font-medium leading-none">
-                  Custom Knowledge ID (optional)
-                </p>
-                <Input
-                  placeholder="Enter a custom knowledge ID"
-                  value={knowledgeId}
-                  onChange={(e) => setKnowledgeId(e.target.value)}
-                />
-                <p className="text-sm font-medium leading-none">
-                  Custom Avatar ID (optional)
-                </p>
-                <Input
-                  placeholder="Enter a custom avatar ID"
-                  value={avatarId}
-                  onChange={(e) => setAvatarId(e.target.value)}
-                />
-                <Select
-                  placeholder="Or select one from these example avatars"
-                  size="md"
-                  onChange={(e) => {
-                    setAvatarId(e.target.value);
-                  }}
-                >
-                  {AVATARS.map((avatar) => (
-                    <SelectItem
-                      key={avatar.avatar_id}
-                      textValue={avatar.avatar_id}
-                    >
-                      {avatar.name}
-                    </SelectItem>
-                  ))}
-                </Select>
-                <Select
-                  label="Select language"
-                  placeholder="Select language"
-                  className="max-w-xs"
-                  selectedKeys={[language]}
-                  onChange={(e) => {
-                    setLanguage(e.target.value);
-                  }}
-                >
-                  {STT_LANGUAGE_LIST.map((lang) => (
-                    <SelectItem key={lang.key}>{lang.label}</SelectItem>
-                  ))}
-                </Select>
-              </div>
-              <Button
-                className="bg-gradient-to-tr from-indigo-500 to-indigo-300 w-full text-white"
-                size="md"
-                variant="shadow"
-                onClick={startSession}
-              >
-                Start session
-              </Button>
+              </div> */}
             </div>
           ) : (
             <Spinner color="default" size="lg" />
