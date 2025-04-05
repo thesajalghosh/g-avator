@@ -46,6 +46,30 @@ export default function InteractiveAvatar() {
   const [chatMode, setChatMode] = useState("text_mode");
   const [isUserTalking, setIsUserTalking] = useState(false);
 
+  const [messages, setMessages] = useState([
+    {
+      text: "Lorem Ipsum is simply dummy text of the printing and",
+      sender: "ai",
+    },
+    { text: "How can I help you today?", sender: "user" },
+    {
+      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+      sender: "ai",
+    },
+    {
+      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+      sender: "user",
+    },
+    {
+      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+      sender: "ai",
+    },
+    {
+      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+      sender: "user",
+    },
+  ]);
+
   useEffect(() => {
     startSession();
   }, []);
@@ -150,6 +174,7 @@ export default function InteractiveAvatar() {
       });
     setIsLoadingRepeat(false);
   }
+
   async function handleInterrupt() {
     if (!avatar.current) {
       setDebug("Avatar API not initialized");
@@ -179,6 +204,7 @@ export default function InteractiveAvatar() {
   });
 
   const previousText = usePrevious(text);
+
   useEffect(() => {
     if (!previousText && text) {
       avatar.current?.startListening();
@@ -206,39 +232,50 @@ export default function InteractiveAvatar() {
   return (
     <div className="w-full flex flex-col gap-4">
       <Card>
-        <CardBody className="h-[500px] flex flex-col justify-center items-center">
+        <CardBody className="h-[20rem] flex flex-col justify-center items-center">
           {stream ? (
-            <div className="h-[500px] w-[900px] justify-center items-center flex rounded-lg overflow-hidden">
-              <video
-                ref={mediaStream}
-                autoPlay
-                playsInline
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "contain",
-                }}
-              >
-                <track kind="captions" />
-              </video>
-              {/* <div className="flex flex-col gap-2 absolute bottom-3 right-3">
-                <Button
-                  className="bg-gradient-to-tr from-indigo-500 to-indigo-300 text-white rounded-lg"
-                  size="md"
-                  variant="shadow"
-                  onClick={handleInterrupt}
-                >
-                  Interrupt task
-                </Button>
-                <Button
-                  className="bg-gradient-to-tr from-indigo-500 to-indigo-300  text-white rounded-lg"
-                  size="md"
-                  variant="shadow"
-                  onClick={endSession}
-                >
-                  End session
-                </Button>
-              </div> */}
+            <div className="flex flex-1 overflow-hidden">
+              <div className="w-1/3 flex flex-col items-center justify-start p-2">
+                <div className="">
+                  <video
+                    ref={mediaStream}
+                    autoPlay
+                    playsInline
+                    style={{
+                      width: "90%",
+                      height: "90%",
+                      objectFit: "contain",
+                    }}
+                  >
+                    <track kind="captions" />
+                  </video>
+                </div>
+              </div>
+
+              <div className="w-2/3 flex flex-col">
+                <div className="flex-1 overflow-y-auto p-2">
+                  {messages.map((message, index) => (
+                    <div
+                      key={index}
+                      className={`mb-4 flex ${
+                        message.sender === "user"
+                          ? "justify-end"
+                          : "justify-start"
+                      }`}
+                    >
+                      <div
+                        className={`rounded-lg p-4 max-w-md ${
+                          message.sender === "user"
+                            ? "bg-emerald-700 text-white"
+                            : "bg-emerald-600 text-white"
+                        }`}
+                      >
+                        <p className="text-sm">{message.text}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           ) : (
             <Spinner color="default" size="lg" />
@@ -285,11 +322,6 @@ export default function InteractiveAvatar() {
           )}
         </CardFooter>
       </Card>
-      <p className="font-mono text-right">
-        <span className="font-bold">Console:</span>
-        <br />
-        {debug}
-      </p>
     </div>
   );
 }
