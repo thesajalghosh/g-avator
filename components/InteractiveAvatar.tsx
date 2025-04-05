@@ -27,6 +27,7 @@ import { useMemoizedFn, usePrevious } from "ahooks";
 import InteractiveAvatarTextInput from "./InteractiveAvatarTextInput";
 
 import { AVATARS, STT_LANGUAGE_LIST } from "@/app/lib/constants";
+import { log } from "console";
 
 export default function InteractiveAvatar() {
   const [isLoadingSession, setIsLoadingSession] = useState(false);
@@ -137,6 +138,8 @@ export default function InteractiveAvatar() {
     await avatar.current
       .speak({ text: text, taskType: TaskType.REPEAT, taskMode: TaskMode.SYNC })
       .catch((e) => {
+        console.log("e.message", e.message);
+        
         setDebug(e.message);
       });
     setIsLoadingRepeat(false);
