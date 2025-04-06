@@ -29,6 +29,11 @@ import InteractiveAvatarTextInput from "./InteractiveAvatarTextInput";
 
 import { AVATARS, STT_LANGUAGE_LIST } from "@/app/lib/constants";
 
+type Message = {
+  text: string;
+  sender: "user" | "ai";
+};
+
 export default function InteractiveAvatar() {
   const [isLoadingSession, setIsLoadingSession] = useState(false);
   const [isLoadingRepeat, setIsLoadingRepeat] = useState(false);
@@ -57,7 +62,6 @@ export default function InteractiveAvatar() {
       text: "",
       sender: "",
     },
-   
   ]);
 
   useEffect(() => {
@@ -94,7 +98,6 @@ export default function InteractiveAvatar() {
       basePath: baseApiUrl(),
     });
 
-
     avatar.current?.on(StreamingEvents.USER_START, (event) => {
       setIsUserTalking(true);
     });
@@ -110,7 +113,7 @@ export default function InteractiveAvatar() {
       if (event?.detail?.message) {
         setMessages((prev) => [
           ...prev,
-          { text:event?.detail?.message, sender: "user" },
+          { text: event?.detail?.message, sender: "user" },
         ]);
         currentUserMessageRef.current = "";
       }
@@ -118,7 +121,10 @@ export default function InteractiveAvatar() {
 
     avatar.current?.on(StreamingEvents.USER_STOP, (event) => {
       setIsUserTalking(false);
-console.log("currentUserMessageRef.current", currentUserMessageRef.current);
+      console.log(
+        "currentUserMessageRef.current",
+        currentUserMessageRef.current
+      );
 
       if (currentUserMessageRef.current) {
         setMessages((prev) => [
@@ -159,8 +165,6 @@ console.log("currentUserMessageRef.current", currentUserMessageRef.current);
       console.log(">>>>> Stream ready:", event.detail);
       setStream(event.detail);
     });
-
-  
 
     try {
       const res = await avatar.current.createStartAvatar({
@@ -226,11 +230,11 @@ console.log("currentUserMessageRef.current", currentUserMessageRef.current);
       return;
     }
 
-    setMessages((prev) => [...prev, { text: text, sender: "user" }]);
+    // setMessages((prev) => [...prev, { text: text, sender: "user" }]);
 
     // speak({ text: text, task_type: TaskType.REPEAT })
     await avatar.current
-      .speak({ text: text, taskType: TaskType.REPEAT, taskMode: TaskMode.SYNC })
+      .speak({ text: text, taskType: TaskType.TALK, taskMode: TaskMode.SYNC })
       .catch((e) => {
         console.log("e.message", e.message);
 
@@ -398,6 +402,7 @@ console.log("currentUserMessageRef.current", currentUserMessageRef.current);
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSpeak()}
+                disabled={!stream}
               />
               <button
                 className="ml-2 text-white hover:text-emerald-300 transition-colors"
@@ -425,46 +430,6 @@ console.log("currentUserMessageRef.current", currentUserMessageRef.current);
               </Button>
             </div>
           )}
-
-          {/* <div className="absolute bottom-4 right-4 flex gap-2">
-            <Button isIconOnly variant="light" className="text-emerald-300">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </Button>
-            <Button isIconOnly variant="light" className="text-emerald-300">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  d="M23 12a11 11 0 01-22 0 11 11 0 0122 0z"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M15 12a3 3 0 01-6 0 3 3 0 016 0z"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </Button>
-          </div> */}
         </CardFooter>
       </Card>
     </div>
