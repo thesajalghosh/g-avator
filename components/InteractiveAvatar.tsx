@@ -45,6 +45,16 @@ export default function InteractiveAvatar() {
   const avatar = useRef<StreamingAvatar | null>(null);
   const [chatMode, setChatMode] = useState("text_mode");
   const [isUserTalking, setIsUserTalking] = useState(false);
+  const [currentAiMessage, setCurrentAiMessage] = useState("");
+  // const [currentUserMessage, setCurrentUserMessage] = useState("")
+
+
+
+  console.log("currentAiMessage", currentAiMessage);
+  const [isAvatarTalking, setIsAvatarTalking] = useState(false);
+  const currentAiMessageRef = useRef("");
+  const currentUserMessageRef = useRef("")
+
 
   const [messages, setMessages] = useState([
     {
@@ -56,18 +66,7 @@ export default function InteractiveAvatar() {
       text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
       sender: "ai",
     },
-    {
-      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-      sender: "user",
-    },
-    {
-      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-      sender: "ai",
-    },
-    {
-      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-      sender: "user",
-    },
+   
   ]);
 
   useEffect(() => {
@@ -104,11 +103,30 @@ export default function InteractiveAvatar() {
       basePath: baseApiUrl(),
     });
     avatar.current.on(StreamingEvents.AVATAR_START_TALKING, (e) => {
-      console.log("Avatar started talking", e);
+      setIsAvatarTalking(true);
+      // currentAiMessageRef.current = "";
+      // setCurrentAiMessage("");
     });
+
+// avator is talking
+avatar.current.on(StreamingEvents.AVATAR_TALKING_MESSAGE, (e) => {
+  if (e.detail?.message) {
+    const newMessage = currentAiMessageRef.current 
+      ? `${currentAiMessageRef.current}${e.detail.message}`
+      : e.detail.message;
+    currentAiMessageRef.current = newMessage;
+    setCurrentAiMessage(newMessage);
+  }
+});
+
+    // this  is stope talking
     avatar.current.on(StreamingEvents.AVATAR_STOP_TALKING, (e) => {
       console.log("Avatar stopped talking", e);
+        setIsAvatarTalking(false);
+      
     });
+
+
     avatar.current.on(StreamingEvents.STREAM_DISCONNECTED, () => {
       console.log("Stream disconnected");
       endSession();
@@ -117,12 +135,24 @@ export default function InteractiveAvatar() {
       console.log(">>>>> Stream ready:", event.detail);
       setStream(event.detail);
     });
+
+
     avatar.current?.on(StreamingEvents.USER_START, (event) => {
-      console.log(">>>>> User started talking:", event);
       setIsUserTalking(true);
     });
+
+    avatar.current?.on(StreamingEvents.USER_TALKING_MESSAGE, (event) => {
+      console.log(">>>>> User started talking:", event?.detail?.message);
+      if (event.detail?.message) {
+        const newMessage = currentUserMessageRef.current 
+          ? `${currentUserMessageRef.current}${event?.detail?.message}`
+          : event.detail.message;
+          currentUserMessageRef.current = newMessage;
+      }
+
+    });
+
     avatar.current?.on(StreamingEvents.USER_STOP, (event) => {
-      console.log(">>>>> User stopped talking:", event);
       setIsUserTalking(false);
     });
     try {
@@ -157,6 +187,32 @@ export default function InteractiveAvatar() {
     }
   }
 
+  useEffect(()=>{
+    if (currentAiMessageRef.current) {
+      setMessages((prev) => [
+        ...prev,
+        { text: currentAiMessageRef.current, sender: "ai" },
+      ]);
+      if(!isAvatarTalking){
+
+        currentAiMessageRef.current = "";
+      }
+    }
+  },[isAvatarTalking]);
+
+  useEffect(()=>{
+    if (currentUserMessageRef.current) {
+      setMessages((prev) => [
+        ...prev,
+        { text: currentUserMessageRef.current, sender: "user" },
+      ]);
+      if(!isUserTalking){
+
+        currentUserMessageRef.current = "";
+      }
+    }
+  },[isUserTalking]);
+
   async function handleSpeak() {
     setIsLoadingRepeat(true);
     if (!avatar.current) {
@@ -172,6 +228,8 @@ export default function InteractiveAvatar() {
 
         setDebug(e.message);
       });
+      console.log("textttttt", text);
+      
     setIsLoadingRepeat(false);
   }
 
@@ -229,6 +287,10 @@ export default function InteractiveAvatar() {
     }
   }, [mediaStream, stream]);
 
+  console.log("messages", messages);
+  console.log("current message", currentAiMessage)
+  
+
   return (
     <div className="w-full flex flex-col gap-4">
       <Card>
@@ -255,24 +317,25 @@ export default function InteractiveAvatar() {
               <div className="w-2/3 flex flex-col">
                 <div className="flex-1 overflow-y-auto p-2">
                   {messages.map((message, index) => (
-                    <div
+                    <>
+                    
+                   {message?.text && <div
                       key={index}
-                      className={`mb-4 flex ${
-                        message.sender === "user"
+                      className={`mb-4 flex ${message.sender === "user"
                           ? "justify-end"
                           : "justify-start"
-                      }`}
+                        }`}
                     >
                       <div
-                        className={`rounded-lg p-4 max-w-md ${
-                          message.sender === "user"
+                        className={`rounded-lg p-4 max-w-md ${message.sender === "user"
                             ? "bg-emerald-700 text-white"
                             : "bg-emerald-600 text-white"
-                        }`}
+                          }`}
                       >
                         <p className="text-sm">{message.text}</p>
                       </div>
-                    </div>
+                    </div>}
+                    </>
                   ))}
                 </div>
               </div>
