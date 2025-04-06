@@ -59,8 +59,36 @@ export default function InteractiveAvatar() {
 
   const [messages, setMessages] = useState([
     {
-      text: "",
-      sender: "",
+      text: "hi",
+      sender: "user",
+    },
+    {
+      text: "hi",
+      sender: "user",
+    },
+    {
+      text: "hi",
+      sender: "user",
+    },
+    {
+      text: "hi",
+      sender: "user",
+    },
+    {
+      text: "hi",
+      sender: "user",
+    },
+    {
+      text: "hi",
+      sender: "user",
+    },
+    {
+      text: "hi",
+      sender: "user",
+    },
+    {
+      text: "hi",
+      sender: "user",
     },
   ]);
 
@@ -303,14 +331,14 @@ export default function InteractiveAvatar() {
   // console.log("current message", currentAiMessage);
 
   return (
-    <div className="w-full flex flex-col gap-4">
-      <Card className="bg-emerald-950 text-white">
-        <CardBody className="h-[30rem] p-0 flex flex-row">
+    <div className="w-full flex justify-center items-center gap-4 px-4">
+      <Card className="bg-emerald-950 text-white w-full">
+        <CardBody className="md:overflow-hidden h-[70rem] md:h-[30rem] p-0 flex flex-col md:flex-row">
           {stream ? (
             <>
               {/* Left side - Avatar video */}
-              <div className="w-1/3 border-r border-emerald-800 flex flex-col items-center justify-center bg-emerald-950 p-4">
-                <div className="overflow-hidden rounded-[5%]  w-74 h-74 mb-8 border-4 border-emerald-700 relative">
+              <div className="w-full md:w-1/3 border-b md:border-r border-emerald-800 flex flex-col items-center justify-center bg-emerald-950 p-4">
+                <div className="md:overflow-hidden rounded-[3%] md:rounded-[5%] w-74 h-74 my-8 border-4 border-emerald-700 relative ">
                   <video
                     ref={mediaStream}
                     autoPlay
@@ -329,7 +357,7 @@ export default function InteractiveAvatar() {
               </div>
 
               {/* Right side - Chat */}
-              <div className="w-2/3 flex flex-col">
+              <div className="w-full md:w-2/3 flex flex-col h-screen md:h-auto">
                 <div className="flex-1 overflow-y-auto p-4">
                   {messages.map((message, index) => (
                     <>
@@ -349,7 +377,9 @@ export default function InteractiveAvatar() {
                                 : "bg-emerald-600 text-white"
                             }`}
                           >
-                            <p className="text-sm">{message.text}</p>
+                            <p className="text-[1.8rem] md:text-sm">
+                              {message.text}
+                            </p>
                           </div>
                         </div>
                       )}
@@ -360,7 +390,7 @@ export default function InteractiveAvatar() {
               
             </>
           ) : (
-            <div className="w-full flex justify-center items-center">
+            <div className="w-full flex justify-center items-center h-[70rem] md:h-[30rem]">
               <Spinner color="success" size="lg" />
             </div>
           )}
@@ -373,7 +403,7 @@ export default function InteractiveAvatar() {
             onSelectionChange={(v) => {
               handleChangeChatMode(v);
             }}
-            className="text-emerald-300"
+            className="text-emerald-300 p-[1.8rem] md:p-[0.6rem]"
             classNames={{
               tabList: "bg-emerald-900",
               cursor: "bg-emerald-500",
@@ -381,49 +411,52 @@ export default function InteractiveAvatar() {
               tabContent: "group-data-[selected=true]:text-white",
             }}
           >
-            <Tab key="text_mode" title="Text mode" />
-            <Tab key="voice_mode" title="Voice mode" />
+            <Tab
+              key="text_mode"
+              title="Text mode"
+              className="text-[2rem] p-[1.5rem] md:p-2 md:text-[1rem]"
+            />
+            <Tab
+              key="voice_mode"
+              title="Voice mode"
+              className="text-[2rem] p-[1.5rem] md:p-2 md:text-[1rem]"
+            />
           </Tabs>
 
           {chatMode === "text_mode" ? (
             <div className="w-full flex relative bg-emerald-900 rounded-full px-4 py-2 items-center">
-              {/* <InteractiveAvatarTextInput
-                disabled={!stream}
-                input={text}
-                label=""
-                loading={isLoadingRepeat}
-                placeholder="Ask me Anything?"
-                setInput={setText}
-                onSubmit={handleSpeak}
-              /> */}
               <input
                 type="text"
                 placeholder="Ask me Anything?"
-                className="bg-transparent border-none outline-none w-full text-white"
+                className="bg-transparent border-none outline-none w-full text-white p-[0.8rem] text-[1.5rem] md:p-[0.2rem] md:text-sm"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSpeak()}
                 disabled={!stream}
               />
-              <button
-                className="ml-2 text-white hover:text-emerald-300 transition-colors"
-                onClick={handleSpeak}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
+              {isLoadingRepeat ? (
+                <Spinner color="success" size="sm" />
+              ) : (
+                <button
+                  className="ml-4 md:ml-2 text-white hover:text-emerald-300 transition-colors"
+                  onClick={handleSpeak}
                 >
-                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                </svg>
-              </button>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 md:h-5 md:w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                  </svg>
+                </button>
+              )}
             </div>
           ) : (
             <div className="w-full text-center">
               <Button
                 isDisabled={!isUserTalking}
-                className="bg-emerald-700 text-white hover:bg-emerald-600"
+                className="bg-emerald-700 text-white hover:bg-emerald-600 text-[1.5rem] md:text-[1rem]"
                 size="md"
                 variant="shadow"
               >
