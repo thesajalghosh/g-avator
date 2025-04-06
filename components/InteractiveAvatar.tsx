@@ -47,21 +47,17 @@ export default function InteractiveAvatar() {
   const [currentAiMessage, setCurrentAiMessage] = useState("");
   // const [currentUserMessage, setCurrentUserMessage] = useState("")
 
-  console.log("currentAiMessage", currentAiMessage);
+  // console.log("currentAiMessage", currentAiMessage);
   const [isAvatarTalking, setIsAvatarTalking] = useState(false);
   const currentAiMessageRef = useRef("");
   const currentUserMessageRef = useRef("");
 
   const [messages, setMessages] = useState([
     {
-      text: "Lorem Ipsum is simply dummy text of the printing and",
-      sender: "ai",
+      text: "",
+      sender: "",
     },
-    { text: "How can I help you today?", sender: "user" },
-    {
-      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-      sender: "ai",
-    },
+   
   ]);
 
   useEffect(() => {
@@ -97,6 +93,41 @@ export default function InteractiveAvatar() {
       token: newToken,
       basePath: baseApiUrl(),
     });
+
+
+    avatar.current?.on(StreamingEvents.USER_START, (event) => {
+      setIsUserTalking(true);
+    });
+
+    avatar.current?.on(StreamingEvents.USER_TALKING_MESSAGE, (event) => {
+      console.log(">>>>> User started talking:", event?.detail?.message);
+      // if (event.detail?.message) {
+      //   const newMessage = currentUserMessageRef.current
+      //     ? `${currentUserMessageRef.current}${event?.detail?.message}`
+      //     : event.detail.message;
+      //   currentUserMessageRef.current = newMessage;
+      // }
+      if (event?.detail?.message) {
+        setMessages((prev) => [
+          ...prev,
+          { text:event?.detail?.message, sender: "user" },
+        ]);
+        currentUserMessageRef.current = "";
+      }
+    });
+
+    avatar.current?.on(StreamingEvents.USER_STOP, (event) => {
+      setIsUserTalking(false);
+console.log("currentUserMessageRef.current", currentUserMessageRef.current);
+
+      if (currentUserMessageRef.current) {
+        setMessages((prev) => [
+          ...prev,
+          { text: currentUserMessageRef.current, sender: "user" },
+        ]);
+        currentUserMessageRef.current = "";
+      }
+    });
     avatar.current.on(StreamingEvents.AVATAR_START_TALKING, (e) => {
       setIsAvatarTalking(true);
       // currentAiMessageRef.current = "";
@@ -129,23 +160,7 @@ export default function InteractiveAvatar() {
       setStream(event.detail);
     });
 
-    avatar.current?.on(StreamingEvents.USER_START, (event) => {
-      setIsUserTalking(true);
-    });
-
-    avatar.current?.on(StreamingEvents.USER_TALKING_MESSAGE, (event) => {
-      console.log(">>>>> User started talking:", event?.detail?.message);
-      if (event.detail?.message) {
-        const newMessage = currentUserMessageRef.current
-          ? `${currentUserMessageRef.current}${event?.detail?.message}`
-          : event.detail.message;
-        currentUserMessageRef.current = newMessage;
-      }
-    });
-
-    avatar.current?.on(StreamingEvents.USER_STOP, (event) => {
-      setIsUserTalking(false);
-    });
+  
 
     try {
       const res = await avatar.current.createStartAvatar({
@@ -191,17 +206,17 @@ export default function InteractiveAvatar() {
     }
   }, [isAvatarTalking]);
 
-  useEffect(() => {
-    if (currentUserMessageRef.current) {
-      setMessages((prev) => [
-        ...prev,
-        { text: currentUserMessageRef.current, sender: "user" },
-      ]);
-      if (!isUserTalking) {
-        currentUserMessageRef.current = "";
-      }
-    }
-  }, [isUserTalking]);
+  // useEffect(() => {
+  //   if (currentUserMessageRef.current) {
+  //     setMessages((prev) => [
+  //       ...prev,
+  //       { text: currentUserMessageRef.current, sender: "user" },
+  //     ]);
+  //     if (!isUserTalking) {
+  //       currentUserMessageRef.current = "";
+  //     }
+  //   }
+  // }, [isUserTalking]);
 
   async function handleSpeak() {
     setIsLoadingRepeat(true);
@@ -281,7 +296,7 @@ export default function InteractiveAvatar() {
   }, [mediaStream, stream]);
 
   console.log("messages", messages);
-  console.log("current message", currentAiMessage);
+  // console.log("current message", currentAiMessage);
 
   return (
     <div className="w-full flex flex-col gap-4">
