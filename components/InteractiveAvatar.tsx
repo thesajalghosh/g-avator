@@ -212,7 +212,7 @@ export default function InteractiveAvatar() {
     }
 
     setMessages((prev) => [...prev, { text: text, sender: "user" }]);
-    
+
     // speak({ text: text, task_type: TaskType.REPEAT })
     await avatar.current
       .speak({ text: text, taskType: TaskType.REPEAT, taskMode: TaskMode.SYNC })
@@ -221,9 +221,9 @@ export default function InteractiveAvatar() {
 
         setDebug(e.message);
       });
-    console.log("textttttt", text);
 
     setIsLoadingRepeat(false);
+    setText("");
   }
 
   async function handleInterrupt() {
