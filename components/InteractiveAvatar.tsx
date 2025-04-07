@@ -59,36 +59,8 @@ export default function InteractiveAvatar() {
 
   const [messages, setMessages] = useState([
     {
-      text: "hi",
-      sender: "user",
-    },
-    {
-      text: "hi",
-      sender: "user",
-    },
-    {
-      text: "hi",
-      sender: "user",
-    },
-    {
-      text: "hi",
-      sender: "user",
-    },
-    {
-      text: "hi",
-      sender: "user",
-    },
-    {
-      text: "hi",
-      sender: "user",
-    },
-    {
-      text: "hi",
-      sender: "user",
-    },
-    {
-      text: "hi",
-      sender: "user",
+      text: "",
+      sender: "",
     },
   ]);
 
@@ -132,12 +104,6 @@ export default function InteractiveAvatar() {
 
     avatar.current?.on(StreamingEvents.USER_TALKING_MESSAGE, (event) => {
       console.log(">>>>> User started talking:", event?.detail?.message);
-      // if (event.detail?.message) {
-      //   const newMessage = currentUserMessageRef.current
-      //     ? `${currentUserMessageRef.current}${event?.detail?.message}`
-      //     : event.detail.message;
-      //   currentUserMessageRef.current = newMessage;
-      // }
       if (event?.detail?.message) {
         setMessages((prev) => [
           ...prev,
@@ -238,18 +204,6 @@ export default function InteractiveAvatar() {
     }
   }, [isAvatarTalking]);
 
-  // useEffect(() => {
-  //   if (currentUserMessageRef.current) {
-  //     setMessages((prev) => [
-  //       ...prev,
-  //       { text: currentUserMessageRef.current, sender: "user" },
-  //     ]);
-  //     if (!isUserTalking) {
-  //       currentUserMessageRef.current = "";
-  //     }
-  //   }
-  // }, [isUserTalking]);
-
   async function handleSpeak() {
     setIsLoadingRepeat(true);
     if (!avatar.current) {
@@ -331,7 +285,7 @@ export default function InteractiveAvatar() {
   // console.log("current message", currentAiMessage);
 
   return (
-    <div className="w-full flex justify-center items-center gap-4 px-4">
+    <div className="w-full flex justify-center items-center gap-4 p-[2rem] md:px-4">
       <Card className="bg-emerald-950 text-white w-full">
         <CardBody className="md:overflow-hidden h-[70rem] md:h-[30rem] p-0 flex flex-col md:flex-row">
           {stream ? (
@@ -387,7 +341,6 @@ export default function InteractiveAvatar() {
                   ))}
                 </div>
               </div>
-              
             </>
           ) : (
             <div className="w-full flex justify-center items-center h-[70rem] md:h-[30rem]">
@@ -396,7 +349,7 @@ export default function InteractiveAvatar() {
           )}
         </CardBody>
         <Divider className="bg-emerald-800" />
-        <CardFooter className="flex flex-col gap-3 relative bg-emerald-950 p-4">
+        <CardFooter className="flex flex-col gap-3 relative bg-emerald-950 p-4 mb-[1rem]">
           <Tabs
             aria-label="Options"
             selectedKey={chatMode}
@@ -424,7 +377,7 @@ export default function InteractiveAvatar() {
           </Tabs>
 
           {chatMode === "text_mode" ? (
-            <div className="w-full flex relative bg-emerald-900 rounded-full px-4 py-2 items-center">
+            <div className="w-[90%] md:w-full fixed bottom-[2rem] md:bottom-0  flex md:relative bg-emerald-900 rounded-full px-4 py-2 items-center">
               <input
                 type="text"
                 placeholder="Ask me Anything?"
@@ -456,7 +409,7 @@ export default function InteractiveAvatar() {
             <div className="w-full text-center">
               <Button
                 isDisabled={!isUserTalking}
-                className="bg-emerald-700 text-white hover:bg-emerald-600 text-[1.5rem] md:text-[1rem]"
+                className="fixed bottom-[2rem] left-1/2 translate-x-[-50%] md:left-0 md:translate-x-0 md:bottom-0 md:relative bg-emerald-700 text-white hover:bg-emerald-600 text-[1.9rem] p-[0.6rem] md:text-[1rem]"
                 size="md"
                 variant="shadow"
               >
