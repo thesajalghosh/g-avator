@@ -49,6 +49,7 @@ export default function InteractiveAvatar() {
   const avatar = useRef<StreamingAvatar | null>(null);
   const [chatMode, setChatMode] = useState("text_mode");
   const [isUserTalking, setIsUserTalking] = useState(false);
+  const [isVoiceMode, setIsVoiceMode] = useState(false);
   const [currentAiMessage, setCurrentAiMessage] = useState("");
   // const [currentUserMessage, setCurrentUserMessage] = useState("")
 
@@ -56,41 +57,39 @@ export default function InteractiveAvatar() {
   const [isAvatarTalking, setIsAvatarTalking] = useState(false);
   const currentAiMessageRef = useRef("");
   const currentUserMessageRef = useRef("");
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const [messages, setMessages] = useState([
     {
-      text: "hi",
+      text: "Lorem Ipsum is simply dummy text of the printing and",
+      sender: "ai",
+    },
+    { text: "How can I help you today?", sender: "user" },
+    {
+      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+      sender: "ai",
+    },
+    {
+      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
       sender: "user",
     },
     {
-      text: "hi",
+      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
       sender: "user",
     },
     {
-      text: "hi",
-      sender: "user",
+      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
+      sender: "ai",
     },
     {
-      text: "hi",
-      sender: "user",
-    },
-    {
-      text: "hi",
-      sender: "user",
-    },
-    {
-      text: "hi",
-      sender: "user",
-    },
-    {
-      text: "hi",
-      sender: "user",
-    },
-    {
-      text: "hi",
+      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
       sender: "user",
     },
   ]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   useEffect(() => {
     startSession();
@@ -127,17 +126,12 @@ export default function InteractiveAvatar() {
     });
 
     avatar.current?.on(StreamingEvents.USER_START, (event) => {
+      setIsVoiceMode(true);
       setIsUserTalking(true);
     });
 
     avatar.current?.on(StreamingEvents.USER_TALKING_MESSAGE, (event) => {
       console.log(">>>>> User started talking:", event?.detail?.message);
-      // if (event.detail?.message) {
-      //   const newMessage = currentUserMessageRef.current
-      //     ? `${currentUserMessageRef.current}${event?.detail?.message}`
-      //     : event.detail.message;
-      //   currentUserMessageRef.current = newMessage;
-      // }
       if (event?.detail?.message) {
         setMessages((prev) => [
           ...prev,
@@ -148,6 +142,7 @@ export default function InteractiveAvatar() {
     });
 
     avatar.current?.on(StreamingEvents.USER_STOP, (event) => {
+      setIsVoiceMode(false);
       setIsUserTalking(false);
       console.log(
         "currentUserMessageRef.current",
@@ -164,8 +159,6 @@ export default function InteractiveAvatar() {
     });
     avatar.current.on(StreamingEvents.AVATAR_START_TALKING, (e) => {
       setIsAvatarTalking(true);
-      // currentAiMessageRef.current = "";
-      // setCurrentAiMessage("");
     });
 
     // avator is talking
@@ -238,18 +231,6 @@ export default function InteractiveAvatar() {
     }
   }, [isAvatarTalking]);
 
-  // useEffect(() => {
-  //   if (currentUserMessageRef.current) {
-  //     setMessages((prev) => [
-  //       ...prev,
-  //       { text: currentUserMessageRef.current, sender: "user" },
-  //     ]);
-  //     if (!isUserTalking) {
-  //       currentUserMessageRef.current = "";
-  //     }
-  //   }
-  // }, [isUserTalking]);
-
   async function handleSpeak() {
     setIsLoadingRepeat(true);
     if (!avatar.current) {
@@ -257,8 +238,6 @@ export default function InteractiveAvatar() {
 
       return;
     }
-
-    // setMessages((prev) => [...prev, { text: text, sender: "user" }]);
 
     // speak({ text: text, task_type: TaskType.REPEAT })
     await avatar.current
@@ -295,6 +274,7 @@ export default function InteractiveAvatar() {
     }
     if (v === "text_mode") {
       avatar.current?.closeVoiceChat();
+      setIsVoiceMode(false);
     } else {
       await avatar.current?.startVoiceChat();
     }
@@ -331,14 +311,14 @@ export default function InteractiveAvatar() {
   // console.log("current message", currentAiMessage);
 
   return (
-    <div className="w-full flex justify-center items-center gap-4 px-4">
-      <Card className="bg-emerald-950 text-white w-full">
-        <CardBody className="md:overflow-hidden h-[70rem] md:h-[30rem] p-0 flex flex-col md:flex-row">
-          {stream ? (
-            <>
-              {/* Left side - Avatar video */}
-              <div className="w-full md:w-1/3 border-b md:border-r border-emerald-800 flex flex-col items-center justify-center bg-emerald-950 p-4">
-                <div className="md:overflow-hidden rounded-[3%] md:rounded-[5%] w-74 h-74 my-8 border-4 border-emerald-700 relative ">
+    <div className="flex h-screen bg-emerald-950 text-white p-4 font-sans">
+      <div className="flex flex-col w-full max-w-6xl mx-auto rounded-lg bg-emerald-950 border border-emerald-800">
+        <div className="flex flex-col md:flex-row flex-1 overflow-auto md:overflow-hidden">
+          {/* Left Side */}
+          <div className="w-full md:w-1/3 border-b md:border-r border-emerald-800 flex flex-col items-center justify-center bg-emerald-950 p-4">
+            {stream ? (
+              <>
+                <div className="md:overflow-hidden rounded-[3%] md:rounded-[5%] w-[10rem] md:w-[11rem] lg:w-[15rem] h-[12rem] md:h-[23rem] mt-5 md:my-8 border-4 border-emerald-700 relative ">
                   <video
                     ref={mediaStream}
                     autoPlay
@@ -354,118 +334,133 @@ export default function InteractiveAvatar() {
                     <track kind="captions" />
                   </video>
                 </div>
+                <div className="relative w-24 md:w-32 h-24 md:h-32 flex items-center justify-center">
+                  <div className="absolute w-14 md:w-24 h-14 md:h-24 bg-cyan-400 opacity-20 rounded-full blur-xl"></div>
+                  <div className="absolute w-10 md:w-20 h-1 md:h-1 bg-cyan-400 opacity-30"></div>
+                  <div className="absolute transform rotate-45 w-10 md:w-20 h-1 md:h-1 bg-cyan-400 opacity-30"></div>
+                  <div className="absolute transform -rotate-45 w-10 md:w-20 h-1 md:h-1 bg-cyan-400 opacity-30"></div>
+                </div>
+              </>
+            ) : (
+              <div className="w-full flex justify-center items-center h-[13rem]">
+                <Spinner color="success" size="lg" />
+                {/* <p>Loading...</p> */}
               </div>
+            )}
+          </div>
 
-              {/* Right side - Chat */}
-              <div className="w-full md:w-2/3 flex flex-col h-screen md:h-auto">
-                <div className="flex-1 overflow-y-auto p-4">
-                  {messages.map((message, index) => (
-                    <>
-                      {message?.text && (
-                        <div
-                          key={index}
-                          className={`mb-4 flex ${
-                            message.sender === "user"
-                              ? "justify-end"
-                              : "justify-start"
-                          }`}
+          {/* Chat Area */}
+          <div className="w-full md:w-2/3 flex flex-col h-screen md:h-auto">
+            <div className="flex-1 overflow-y-auto p-4">
+              {messages.map((message, index) => (
+                <>
+                  {message?.text && (
+                    <div
+                      key={index}
+                      className={`mb-4 flex ${
+                        message.sender === "user"
+                          ? "justify-end"
+                          : "justify-start"
+                      }`}
+                    >
+                      <div
+                        className={`rounded-lg p-4 max-w-md ${
+                          message.sender === "user"
+                            ? "bg-green-200 text-black"
+                            : "bg-white text-gray-800"
+                        }`}
+                      >
+                        <p className="text-[0.8rem] md:text-sm leading-relaxed">
+                          {message.text}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ))}
+
+              {isUserTalking && (
+                <div className="flex justify-center items-center my-4">
+                  <div className="bg-emerald-800 rounded-full px-6 py-2 flex items-center animate-pulse">
+                    <div className="mr-2 w-2 h-2 bg-red-500 rounded-full"></div>
+                    <span className="text-sm">Listening...</span>
+                  </div>
+                </div>
+              )}
+
+              <div ref={messagesEndRef} />
+            </div>
+
+            <div className="sticky bottom-0 md:relative w-full  p-4 bg-emerald-950 border-t border-emerald-800">
+              <div className="flex items-center">
+                <div className="hidden w-10 h-10 bg-emerald-700 rounded-full flex-shrink-0 md:flex md:items-center md:justify-center">
+                  <span className="text-xs">You</span>
+                </div>
+                <div className="flex-1 mx-3">
+                  <div className="bg-emerald-900 rounded-full px-4 py-2 flex items-center">
+                    <input
+                      type="text"
+                      placeholder="Ask me Anything?"
+                      className="bg-transparent border-none outline-none w-full text-white"
+                      value={text}
+                      onChange={(e) => {
+                        setText(e.target.value);
+                        setTimeout(() => {
+                          handleChangeChatMode("text_mode");
+                        }, 1000);
+                      }}
+                      onKeyDown={(e) => e.key === "Enter" && handleSpeak()}
+                      disabled={!stream}
+                    />
+                    {isLoadingRepeat ? (
+                      <Spinner color="success" size="sm" />
+                    ) : (
+                      // "Load"
+                      <button
+                        className="ml-2 text-white hover:text-emerald-300 transition-colors"
+                        onClick={handleSpeak}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
                         >
-                          <div
-                            className={`rounded-lg p-4 max-w-md ${
-                              message.sender === "user"
-                                ? "bg-emerald-700 text-white"
-                                : "bg-emerald-600 text-white"
-                            }`}
-                          >
-                            <p className="text-[1.8rem] md:text-sm">
-                              {message.text}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  ))}
+                          <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                        </svg>
+                      </button>
+                    )}
+                    <button
+                      className={`ml-2 transition-colors ${
+                        isVoiceMode
+                          ? "text-red-500"
+                          : "text-white hover:text-emerald-300"
+                      }`}
+                      onClick={() => {
+                        handleChangeChatMode("voice_mode");
+                        setIsVoiceMode(true);
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </div>
-              
-            </>
-          ) : (
-            <div className="w-full flex justify-center items-center h-[70rem] md:h-[30rem]">
-              <Spinner color="success" size="lg" />
             </div>
-          )}
-        </CardBody>
-        <Divider className="bg-emerald-800" />
-        <CardFooter className="flex flex-col gap-3 relative bg-emerald-950 p-4">
-          <Tabs
-            aria-label="Options"
-            selectedKey={chatMode}
-            onSelectionChange={(v) => {
-              handleChangeChatMode(v);
-            }}
-            className="text-emerald-300 p-[1.8rem] md:p-[0.6rem]"
-            classNames={{
-              tabList: "bg-emerald-900",
-              cursor: "bg-emerald-500",
-              tab: "text-emerald-300",
-              tabContent: "group-data-[selected=true]:text-white",
-            }}
-          >
-            <Tab
-              key="text_mode"
-              title="Text mode"
-              className="text-[2rem] p-[1.5rem] md:p-2 md:text-[1rem]"
-            />
-            <Tab
-              key="voice_mode"
-              title="Voice mode"
-              className="text-[2rem] p-[1.5rem] md:p-2 md:text-[1rem]"
-            />
-          </Tabs>
-
-          {chatMode === "text_mode" ? (
-            <div className="w-full flex relative bg-emerald-900 rounded-full px-4 py-2 items-center">
-              <input
-                type="text"
-                placeholder="Ask me Anything?"
-                className="bg-transparent border-none outline-none w-full text-white p-[0.8rem] text-[1.5rem] md:p-[0.2rem] md:text-sm"
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSpeak()}
-                disabled={!stream}
-              />
-              {isLoadingRepeat ? (
-                <Spinner color="success" size="sm" />
-              ) : (
-                <button
-                  className="ml-4 md:ml-2 text-white hover:text-emerald-300 transition-colors"
-                  onClick={handleSpeak}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 md:h-5 md:w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                  </svg>
-                </button>
-              )}
-            </div>
-          ) : (
-            <div className="w-full text-center">
-              <Button
-                isDisabled={!isUserTalking}
-                className="bg-emerald-700 text-white hover:bg-emerald-600 text-[1.5rem] md:text-[1rem]"
-                size="md"
-                variant="shadow"
-              >
-                {isUserTalking ? "Listening" : "Voice chat"}
-              </Button>
-            </div>
-          )}
-        </CardFooter>
-      </Card>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
