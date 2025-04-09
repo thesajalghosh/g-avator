@@ -350,7 +350,7 @@ export default function InteractiveAvatar() {
           </div>
 
           {/* Chat Area */}
-          <div className="w-full md:w-2/3 flex flex-col h-screen md:h-auto">
+          <div className="w-full md:w-2/3 flex flex-col h-screen md:h-auto mb-[3rem] md:mb-0">
             <div className="flex-1 overflow-y-auto p-4">
               {messages.map((message, index) => (
                 <>
@@ -391,7 +391,7 @@ export default function InteractiveAvatar() {
               <div ref={messagesEndRef} />
             </div>
 
-            <div className="sticky bottom-0 md:relative w-full  p-4 bg-emerald-950 border-t border-emerald-800">
+            <div className="fixed bottom-0 right-0 md:relative w-full  p-4 bg-emerald-950 border-t border-emerald-800">
               <div className="flex items-center">
                 <div className="hidden w-10 h-10 bg-emerald-700 rounded-full flex-shrink-0 md:flex md:items-center md:justify-center">
                   <span className="text-xs">You</span>
