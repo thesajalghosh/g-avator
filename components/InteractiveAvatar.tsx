@@ -377,7 +377,7 @@ export default function InteractiveAvatar() {
   }, [isAvatarTalking, isUserTalking])
 
   useEffect(() => {
-    if (timeElapsed >= 10) {
+    if (timeElapsed >= 30) {
       endSession();
       window.location.reload()
     }
@@ -401,7 +401,7 @@ export default function InteractiveAvatar() {
   }, [isAvatarTalking, text])
 
   useEffect(() => {
-    if (timeElapsedKeypress >= 10) {
+    if (timeElapsedKeypress >= 30) {
       endSession();
       window.location.reload()
     }
