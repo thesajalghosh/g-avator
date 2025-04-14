@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await dbConnect();
+    //await dbConnect();
 
     const session = await Session.findOneAndUpdate(
       { userId, sessionId, status: 'active' },

@@ -45,7 +45,7 @@ export default function InteractiveAvatar() {
 
   const [data, setData] = useState<StartAvatarResponse>();
   const [text, setText] = useState<string>("");
-  const mediaStream = useRef<HTMLVideoElement>(null);
+  const mediaStream = useRef<HTMLVideoElement | null>(null);
   const avatar = useRef<StreamingAvatar | null>(null);
   const [chatMode, setChatMode] = useState("text_mode");
   const [isUserTalking, setIsUserTalking] = useState(false);
@@ -93,6 +93,10 @@ export default function InteractiveAvatar() {
 
   useEffect(() => {
     startSession();
+
+    return () => {
+      endSession();
+    }
   }, []);
 
   function baseApiUrl() {
@@ -136,7 +140,7 @@ export default function InteractiveAvatar() {
   };
   
 
-  async function startSession() {
+async function startSession() {
     setIsLoadingSession(true);
 
     const newToken = await fetchAccessToken();
@@ -228,7 +232,7 @@ export default function InteractiveAvatar() {
       language: language,
       disableIdleTimeout: true,
     });
-
+    console.log("DATA", res);
     setData(res);
     // default to voice mode
     await avatar.current?.startVoiceChat({
@@ -288,6 +292,8 @@ async function handleInterrupt() {
 
 async function endSession() {
   await avatar.current?.stopAvatar();
+  avatar.current = null;
+  mediaStream.current = null;
   setStream(undefined);
 }
 
@@ -313,12 +319,6 @@ useEffect(() => {
     avatar?.current?.stopListening();
   }
 }, [text, previousText]);
-
-useEffect(() => {
-  return () => {
-    endSession();
-  };
-}, []);
 
 const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
@@ -389,13 +389,24 @@ return (
           )}
         </div>
         {!isVideoPlaying && (
+          <>
           <button
             onClick={handlePlayVideo}
             className="bg-emerald-700 text-white px-4 py-2 rounded"
           >
             Play Video
           </button>
+
+         
+          </>
         )}
+
+        <button
+          onClick={endSession}
+          className="bg-emerald-700 text-white px-4 py-2 rounded"
+          >
+          End Session
+          </button>
 
         {/* Chat Area */}
         <div className="w-full md:w-2/3 flex flex-col h-screen md:h-auto mb-[3rem] md:mb-0">

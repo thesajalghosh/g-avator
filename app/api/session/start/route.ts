@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await dbConnect();
+    //await dbConnect();
 
     // Optional: Check if session already exists
     const existing = await Session.findOne({ sessionId });
