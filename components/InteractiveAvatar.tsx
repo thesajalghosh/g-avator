@@ -61,30 +61,11 @@ export default function InteractiveAvatar() {
 
   const [messages, setMessages] = useState([
     {
-      text: "Lorem Ipsum is simply dummy text of the printing and",
-      sender: "ai",
+      text: "",
+      sender: "",
     },
-    { text: "How can I help you today?", sender: "user" },
-    {
-      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-      sender: "ai",
-    },
-    {
-      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-      sender: "user",
-    },
-    {
-      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-      sender: "user",
-    },
-    {
-      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-      sender: "ai",
-    },
-    {
-      text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-      sender: "user",
-    },
+    
+   
   ]);
 
   useEffect(() => {
@@ -140,7 +121,7 @@ export default function InteractiveAvatar() {
     setIsLoadingSession(true);
 
     const newToken = await fetchAccessToken();
-    handleStartSession()
+
    
 
   avatar.current = new StreamingAvatar({
@@ -185,12 +166,41 @@ export default function InteractiveAvatar() {
   });
 
   // avator is talking
+  // avatar.current.on(StreamingEvents.AVATAR_TALKING_MESSAGE, (e) => {
+  //   if (e.detail?.message) {
+  //     const newMessage = currentAiMessageRef.current
+  //       ? `${currentAiMessageRef.current}${e.detail.message}`
+  //       : e.detail.message;
+  //     currentAiMessageRef.current = newMessage;
+  //     setCurrentAiMessage(newMessage);
+  //   }
+  // });
+
   avatar.current.on(StreamingEvents.AVATAR_TALKING_MESSAGE, (e) => {
     if (e.detail?.message) {
       const newMessage = currentAiMessageRef.current
-        ? `${currentAiMessageRef.current}${e.detail.message}`
+        ? `${currentAiMessageRef.current} ${e.detail.message}`
         : e.detail.message;
+  
       currentAiMessageRef.current = newMessage;
+  
+      // Update the last AI message dynamically
+      setMessages((prev) => {
+        const updatedMessages = [...prev];
+        if (
+          updatedMessages.length > 0 &&
+          updatedMessages[updatedMessages.length - 1].sender === "ai"
+        ) {
+          // Update the last AI message
+          updatedMessages[updatedMessages.length - 1].text = newMessage;
+        } else {
+          // Add a new AI message if none exists
+          updatedMessages.push({ text: newMessage, sender: "ai" });
+        }
+        return updatedMessages;
+      });
+  
+      // Update the current AI message state
       setCurrentAiMessage(newMessage);
     }
   });
@@ -350,6 +360,20 @@ const handlePlayVideo = () => {
 };
 
 return (
+  <>
+   {!isVideoPlaying && (
+      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md z-50">
+        <button
+          onClick={() => {
+            handlePlayVideo();
+            startSession(); // Start the session when the button is clicked
+          }}
+          className="bg-emerald-700 text-white px-6 py-3 rounded-lg text-lg font-semibold shadow-lg hover:bg-emerald-800 transition"
+        >
+          Chat Now
+        </button>
+      </div>
+    )}
   <div className="flex h-screen bg-emerald-950 text-white p-4 font-sans">
     <div className="flex flex-col w-full max-w-6xl mx-auto rounded-lg bg-emerald-950 border border-emerald-800">
       <div className="flex flex-col md:flex-row flex-1 overflow-auto md:overflow-hidden">
@@ -388,14 +412,7 @@ return (
             </div>
           )}
         </div>
-        {!isVideoPlaying && (
-          <button
-            onClick={handlePlayVideo}
-            className="bg-emerald-700 text-white px-4 py-2 rounded"
-          >
-            Play Video
-          </button>
-        )}
+      
 
         {/* Chat Area */}
         <div className="w-full md:w-2/3 flex flex-col h-screen md:h-auto mb-[3rem] md:mb-0">
@@ -507,5 +524,6 @@ return (
       </div>
     </div>
   </div>
+  </>
 );
 }
