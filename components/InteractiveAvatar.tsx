@@ -39,7 +39,7 @@ export default function InteractiveAvatar() {
   const [isLoadingRepeat, setIsLoadingRepeat] = useState(false);
   const [stream, setStream] = useState<MediaStream>();
   const [debug, setDebug] = useState<string>();
-  const [knowledgeId, setKnowledgeId] = useState<string>("");
+  const [knowledgeId, setKnowledgeId] = useState<string>("881cc084c15f4ced938ca82d3d4c3a89");
   const [avatarId, setAvatarId] = useState<string>("");
   const [language, setLanguage] = useState<string>("en");
 
@@ -377,7 +377,7 @@ export default function InteractiveAvatar() {
   }, [isAvatarTalking, isUserTalking])
 
   useEffect(() => {
-    if (timeElapsed >= 30) {
+    if (timeElapsed >= 60) {
       endSession();
       window.location.reload()
     }
@@ -401,7 +401,7 @@ export default function InteractiveAvatar() {
   }, [isAvatarTalking, text])
 
   useEffect(() => {
-    if (timeElapsedKeypress >= 30) {
+    if (timeElapsedKeypress >= 60) {
       endSession();
       window.location.reload()
     }
@@ -497,9 +497,12 @@ export default function InteractiveAvatar() {
                               __html: message.text
                                 .replace(/\s+/g, " ") // Normalize spaces in the text
                                 .replace(
-                                  /visit\s+([a-zA-Z0-9.-]+\s*\.com)\b/g, // Match "visit" followed by a domain
-                                  (match, domain) =>
-                                    `visit <a href="https://${match.replace(/\s+/g, '')}" target="_blank" rel="noopener noreferrer" class="text-blue-500 underline">${match}</a>`
+                                  /(https?:\/\/[^\s]+|[a-zA-Z0-9.-]+\s*\.com\b)/g, // Match URLs starting with http/https or domains ending with .com
+                                  (match) => {
+                                    const cleanedMatch = match.replace(/\s+/g, ""); // Remove spaces from the match
+                                    const url = cleanedMatch.startsWith("http") ? cleanedMatch : `https://${cleanedMatch}`;
+                                    return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-500 underline">${cleanedMatch}</a>`;
+                                  }
                                 ),
                             }}
                             className="text-[0.8rem] md:text-sm leading-relaxed"
