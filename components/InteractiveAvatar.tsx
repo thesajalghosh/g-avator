@@ -93,7 +93,6 @@ export default function InteractiveAvatar() {
       });
       const token = await response.text();
 
-      console.log("Access Token:", token); // Log the token to verify
 
       return token;
     } catch (error) {
@@ -116,7 +115,7 @@ export default function InteractiveAvatar() {
       });
 
       const data = await res.json();
-      console.log('Session Start Response:', data);
+
     } catch (err) {
       console.error('Error starting session:', err);
     }
@@ -276,8 +275,6 @@ export default function InteractiveAvatar() {
     await avatar.current
       .speak({ text: text, taskType: TaskType.TALK, taskMode: TaskMode.SYNC })
       .catch((e) => {
-        console.log("e.message", e.message);
-
         setDebug(e.message);
       });
 
@@ -341,7 +338,6 @@ export default function InteractiveAvatar() {
     }
   }, [mediaStream, stream]);
 
-  console.log("messages", messages);
   // console.log("current message", currentAiMessage);
   const handlePlayVideo = () => {
     if (mediaStream.current) {
@@ -349,7 +345,7 @@ export default function InteractiveAvatar() {
         .play()
         .then(() => {
           setDebug("Playing");
-          console.log("HERE")
+
           setIsVideoPlaying(true);
         })
         .catch((error) => {
@@ -407,10 +403,84 @@ export default function InteractiveAvatar() {
     }
   }, [timeElapsedKeypress])
 
+  const formatMessageText = (text?: string): string => {
+    if (!text) return '';
+
+    // First handle Markdown links [text](url)
+    let formattedText = text.replace(
+      /\[([^\]]+)\]\(([^)]+)\)/g,
+      (_, text, url) => {
+        const cleanUrl = url.replace(/\s+/g, '');
+        return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-500 underline">${cleanUrl}</a>`;
+      }
+    );
+
+    // Then handle plain URLs with protocols
+    formattedText = formattedText.replace(
+      /(https?:\/\/[^\s]+)/gi,
+      (match) => {
+        const cleanUrl = match.replace(/\s+/g, '');
+        return `<a href="${cleanUrl}">${cleanUrl}</a>`;
+      }
+    );
+    // Finally handle domain names without protocols - ensure no spaces in domain names
+    formattedText = formattedText.replace(
+      /\b([a-zA-Z0-9-]+\.(?:com|in|org|uk|net|io)[^\s,.]*)\b/gi,
+      (match) => {
+        if (match.startsWith('http')) return match; // Skip if already processed
+        const cleaned = match.replace(/\s+/g, '');
+        return `<a href="https://${cleaned}" target="_blank" rel="noopener noreferrer" class="text-blue-500 underline">${cleaned}</a>`;
+        // return `${cleaned}`;
+      }
+    );
+    console.log("formattedText", formattedText)
+    return formattedText;
+  };
+
+  const processTextWithUrls = (text: string): string => {
+    // Match either:
+    // 1. Markdown-style links [text](url)
+    // 2. Plain URLs (http/https or domain with TLD)
+    const urlRegex = /(\[(.*?)\]\((.*?)\))|(https?:\/\/[^\s]*|(?:www\.)?[a-zA-Z0-9-]+\s*\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2})?[^\s]*)/gi;
+
+    return text.replace(urlRegex, (match: string, ...groups: any[]): string => {
+      // Handle markdown-style links [text](url)
+      if (groups[0]) {  // First capture group exists (markdown link)
+        const displayText = groups[1] || '';
+        let url = groups[2] || '';
+
+        // Clean URL and ensure proper protocol
+        url = url.replace(/\s+/g, '');
+        if (!url.startsWith('http')) {
+          url = `https://${url}`;
+        }
+
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-500 underline">${displayText.trim()}</a>`;
+      }
+
+      // Handle plain URLs
+      let cleanedUrl = match.replace(/\s+/g, '');
+
+      // Add protocol if missing
+      if (!cleanedUrl.startsWith('http')) {
+        cleanedUrl = `https://${cleanedUrl}`;
+      }
+
+      // Fix any protocol duplication
+      cleanedUrl = cleanedUrl
+        .replace(/^http(s?):\/\/http(s?):\/\//, 'http$1://')
+        .replace(/^https:\/\/https:\/\//, 'https://');
+
+      return `<a href="${cleanedUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-500 underline">${cleanedUrl}</a>`;
+    });
+  };
+
+
+
 
   return (
     <>
-      {!isVideoPlaying && !isLoadingSession && (
+      {/* {!isVideoPlaying && !isLoadingSession && (
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md z-50">
           <button
             onClick={async () => {
@@ -419,6 +489,31 @@ export default function InteractiveAvatar() {
               ; // Start the session when the button is clicked
             }}
             className="bg-emerald-700 text-white px-6 py-3 rounded-lg text-lg font-semibold shadow-lg hover:bg-emerald-800 transition"
+          >
+            Chat Now
+          </button>
+        </div>
+      )} */}
+      {!isVideoPlaying && !isLoadingSession && (
+        <div
+          className="absolute inset-0 flex items-center justify-center z-50"
+        >
+       
+          <div className="absolute inset-0" style={{
+            backgroundImage: "url('/background.png')", // Changed background color to red
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            height: "100%",
+            width: "33%",
+          }} ></div>
+
+          {/* Button */}
+          <button
+            onClick={async () => {
+              await startSession();
+              handlePlayVideo();
+            }}
+            className="relative bg-emerald-700 text-white px-6 py-3 rounded-lg text-lg font-semibold shadow-lg hover:bg-emerald-800 transition"
           >
             Chat Now
           </button>
@@ -475,7 +570,7 @@ export default function InteractiveAvatar() {
 
             {/* Chat Area */}
             <div className="w-full md:w-2/3 flex flex-col h-screen md:h-auto mb-[3rem] md:mb-0">
-              <div className="flex-1 overflow-y-auto p-4">
+              {/* <div className="flex-1 overflow-y-auto p-4">
                 {messages.map((message, index) => (
                   <>
                     {message?.text && (
@@ -523,7 +618,152 @@ export default function InteractiveAvatar() {
                 )}
 
                 <div ref={messagesEndRef} />
+              </div>  */}
+
+              {/* <div className="flex-1 overflow-y-auto p-4">
+                {messages.map((message, index) => (
+                  <>
+                    {message?.text && (
+                      <div
+                        key={index}
+                        className={`mb-4 flex ${message.sender === "user" ? "justify-end" : "justify-start"
+                          }`}
+                      >
+                        <div
+                          className={`rounded-lg p-4 max-w-md ${message.sender === "user"
+                              ? "bg-green-200 text-black"
+                              : "bg-white text-gray-800"
+                            }`}
+                        >
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: message.text
+                                .replace(/\s+/g, " ") // Normalize spaces
+                                // First convert Markdown links [text](url)
+                                .replace(
+                                  /\[([^\]]+)\]\(([^)]+)\)/g,
+                                  (match, text, url) => {
+                                    const cleanUrl = url.replace(/\s+/g, '');
+                                    return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-500 underline">${text}</a>`;
+                                    // return "Sajal";
+                                  }
+                                )
+                                // Then handle plain URLs with protocols
+                                .replace(
+                                  /(https?:\/\/[^\s]+)/gi,
+                                  (match) => `
+                                  <a href="${match.replace(/\s+/g, '')}" target="_blank" rel="noopener noreferrer" class="text-blue-500 underline">
+                                  
+                                  ${match.replace(/\s+/g, '')}
+                                  
+                                  </a>`
+                                )
+                                // Finally handle domain names without protocols
+                                .replace(
+                                  /\b([a-zA-Z0-9-]+\.(?:com|in|org|uk|net|io)[^\s]*)\b/gi,
+                                  (match) => {
+                                    const cleaned = match.replace(/\s+/g, '');
+                                    return `<a href="https://${cleaned}" target="_blank" rel="noopener noreferrer" class="text-blue-500 underline">${cleaned}</a>`;
+                                  }
+                                )
+                            }}
+                            className="text-[0.8rem] md:text-sm leading-relaxed"
+                          ></div>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ))}
+
+                {isUserTalking && (
+                  <div className="flex justify-center items-center my-4">
+                    <div className="bg-emerald-800 rounded-full px-6 py-2 flex items-center animate-pulse">
+                      <div className="mr-2 w-2 h-2 bg-red-500 rounded-full"></div>
+                      <span className="text-sm">Listening...</span>
+                    </div>
+                  </div>
+                )}
+
+                <div ref={messagesEndRef} />
+              </div> */}
+              {/* 
+<div className="flex-1 overflow-y-auto p-4">
+      {messages.map((message, index) => (
+        <>
+          {message?.text && (
+            <div
+              className={`mb-4 flex ${
+                message.sender === "user" ? "justify-end" : "justify-start"
+              }`}
+            >
+              <div
+                className={`rounded-lg p-4 max-w-md ${
+                  message.sender === "user"
+                    ? "bg-green-200 text-black"
+                    : "bg-white text-gray-800"
+                }`}
+              >
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: formatMessageText(message.text)
+                  }}
+                  className="text-[0.8rem] md:text-sm leading-relaxed"
+                />
               </div>
+            </div>
+          )}
+        </>
+      ))}
+      
+      {isUserTalking && (
+        <div className="flex justify-center items-center my-4">
+          <div className="bg-emerald-800 rounded-full px-6 py-2 flex items-center animate-pulse">
+            <div className="mr-2 w-2 h-2 bg-red-500 rounded-full"></div>
+            <span className="text-sm">Listening...</span>
+          </div>
+        </div>
+      )}
+      
+      <div ref={messagesEndRef} />
+    </div> */}
+
+              <div className="flex-1 overflow-y-auto p-4">
+                {messages.map((message, index) => (
+                  <>
+                    {message?.text && (
+                      <div
+                        key={index}
+                        className={`mb-4 flex ${message.sender === "user" ? "justify-end" : "justify-start"
+                          }`}
+                      >
+                        <div
+                          className={`rounded-lg p-4 max-w-md ${message.sender === "user"
+                              ? "bg-green-200 text-black"
+                              : "bg-white text-gray-800"
+                            }`}
+                        >
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: processTextWithUrls(message.text),
+                            }}
+                            className="text-[0.8rem] md:text-sm leading-relaxed"
+                          ></div>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ))}
+              </div>
+
+
+
+
+
+
+
+
+
+
 
               <div className="fixed bottom-0 right-0 md:relative w-full  p-4 bg-emerald-950 border-t border-emerald-800">
                 <div className="flex items-center">
