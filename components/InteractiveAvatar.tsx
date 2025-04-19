@@ -61,6 +61,7 @@ export default function InteractiveAvatar() {
   const currentAiMessageRef = useRef("");
   const currentUserMessageRef = useRef("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const [messages, setMessages] = useState([
     {
@@ -496,35 +497,64 @@ export default function InteractiveAvatar() {
       )} */}
       {!isVideoPlaying && !isLoadingSession && (
         <div
-          className="absolute inset-0 flex items-center justify-center z-50"
+          className="absolute inset-0 flex items-center justify-center z-50 w-[100vw]  md:w-full lg:w-full"
         >
-       
-          <div className="absolute inset-0" style={{
-            backgroundImage: "url('/background.png')", // Changed background color to red
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            height: "100%",
-            width: "33%",
-          }} ></div>
 
-          {/* Button */}
-          <button
-            onClick={async () => {
-              await startSession();
-              handlePlayVideo();
-            }}
-            className="relative bg-emerald-700 text-white px-6 py-3 rounded-lg text-lg font-semibold shadow-lg hover:bg-emerald-800 transition"
+          <div className="min-h-screen bg-black text-white font-sans">
+            {/* Header */}
+            {/* Avatar Card */}
+            <div className="flex justify-center items-center w-[100%] lg:mt-20 md:mt-32">
+              <div className="bg-gradient-to-b from-gray-800 to-green-900 pb-4 md:rounded-[2rem] w-[100vw] h-[100vh] md:w-[300px]  md:h-full text-center">
+                <div className="bg-gradient-to-b from-[#2c2c2c] to-[#003d2e] md:rounded-[2rem]  mb-4 border-[#046C59] border-[0.5px] h-[80vh] md:h-[60vh]">
+                  <img
+                    src="/background.png" // Replace with your avatar image or avatar streaming component
+                    alt="Avatar"
+                    className="rounded-[2rem] mx-auto h-[79vh] md:h-[60vh]"
+                  />
+                </div>
+                {/* <button 
+          className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-md font-semibold mt-4"
+          onClick={async () => {
+            await startSession()
+            handlePlayVideo();
+            ; // Start the session when the button is clicked
+          }}
           >
             Chat Now
-          </button>
+          </button> */}
+                <button
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white
+                   px-6 py-2 rounded-md font-semibold mt-4
+                    md:mt-0 md:relative fixed bottom-4
+                     left-1/2 md:left-16 transform -translate-x-1/2 w-[90%] md:w-auto
+                     md:mt-4"
+                  onClick={async () => {
+                    await startSession();
+                    handlePlayVideo();
+                    // Start the session when the button is clicked
+                  }}
+                >
+                  Chat Now
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
       {
         isLoadingSession && (
-          <div className="absolute top-0 left-0 w-full h-full bg-black z-10">
-            <h2 className="text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">Loading...</h2>
-          </div>
+          // <div className="absolute top-0 left-0 w-full h-full bg-black z-10">
+          //   {/* <h2 className="text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            
+          //   </h2> */}
+          //    <div className="w-8 h-8 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+          //    <span className="text-sm text-emerald-600">Loading...</span>
+          // </div>
+          <div className="absolute top-0 left-0 w-full h-full bg-black z-10 flex items-center justify-center">
+  <div className="w-8 h-8 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+  <span className="text-sm text-emerald-600 ml-2">Loading...</span>
+</div>
 
         )
       }
@@ -738,8 +768,8 @@ export default function InteractiveAvatar() {
                       >
                         <div
                           className={`rounded-lg p-4 max-w-md ${message.sender === "user"
-                              ? "bg-green-200 text-black"
-                              : "bg-white text-gray-800"
+                            ? "bg-green-200 text-black"
+                            : "bg-white text-gray-800"
                             }`}
                         >
                           <div
