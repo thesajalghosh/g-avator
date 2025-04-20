@@ -7,3 +7,12 @@ li {
   margin-left: 30px;
   padding: 2px;
 }
+
+
+.nextjs-toast-errors-parent {
+  display: none !important;
+}
+
+.nextjs-portal {
+  display: none !important;
+}
