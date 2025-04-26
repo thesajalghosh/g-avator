@@ -40,7 +40,7 @@ export default function InteractiveAvatar() {
   const [isLoadingRepeat, setIsLoadingRepeat] = useState(false);
   const [stream, setStream] = useState<MediaStream>();
   const [debug, setDebug] = useState<string>();
-  const [knowledgeId, setKnowledgeId] = useState<string>("881cc084c15f4ced938ca82d3d4c3a89");
+  const [knowledgeId, setKnowledgeId] = useState<string>("202aadc9c93a41d1a282d1ec1c16e950");
   const [avatarId, setAvatarId] = useState<string>("");
   const [language, setLanguage] = useState<string>("en");
 
@@ -232,7 +232,7 @@ export default function InteractiveAvatar() {
     try {
       const res = await avatar.current.createStartAvatar({
         quality: AvatarQuality.Low,
-        avatarName: "6892d4f6f97747ae99c726ab032c1a20",
+        avatarName: "5f062eb00a3d4ed2aaba9078965d8b68",
         knowledgeId: knowledgeId, // Or use a custom `knowledgeBase`.
         voice: {
           rate: 1.5, // 0.5 ~ 1.5
@@ -516,7 +516,7 @@ export default function InteractiveAvatar() {
               <div className="bg-gradient-to-b from-gray-800 to-green-900 pb-4 md:rounded-[2rem] w-[100vw] h-[100vh] md:w-[300px]  md:h-full text-center">
                 <div className="bg-gradient-to-b from-[#2c2c2c] to-[#003d2e] md:rounded-[2rem]  mb-4 border-[#046C59] border-[0.5px] h-[80vh] md:h-[60vh]">
                   <img
-                    src="/background.png" // Replace with your avatar image or avatar streaming component
+                    src="/gk_image.png" // Replace with your avatar image or avatar streaming component
                     alt="Avatar"
                     className="rounded-[2rem] mx-auto h-[79vh] md:h-[60vh]"
                   />
@@ -580,7 +580,7 @@ export default function InteractiveAvatar() {
             <div className="w-full md:w-1/3 border-b md:border-r border-emerald-800 flex flex-col items-center justify-center bg-emerald-950 p-4">
               {stream ? (
                 <>
-                  <div className="md:overflow-hidden rounded-[3%] md:rounded-[5%] w-[10rem] md:w-[11rem] lg:w-[15rem] h-[12rem] md:h-[23rem] mt-5 md:my-8 border-4 border-emerald-700 relative ">
+                  <div className="pl-6 bg-black  md:overflow-hidden rounded-[3%] md:rounded-[5%] w-[10rem] md:w-[11rem] lg:w-[17rem] h-[12rem] md:h-[23rem] mt-5 md:my-8 border-4 border-emerald-700 relative ">
                     <video
                       ref={mediaStream}
                       autoPlay
