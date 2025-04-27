@@ -514,7 +514,7 @@ export default function InteractiveAvatar() {
             {/* Avatar Card */}
             <div className="flex justify-center items-center w-[100%] lg:mt-20 md:mt-32">
               <div className="bg-gradient-to-b from-gray-800 to-green-900 pb-4 md:rounded-[2rem] w-[100vw] h-[100vh] md:w-[300px]  md:h-full text-center">
-                <div className="bg-gradient-to-b from-[#2c2c2c] to-[#003d2e] md:rounded-[2rem]  mb-4 border-[#046C59] border-[0.5px] h-[80vh] md:h-[60vh]">
+                <div className="pt-6 md:pt-0 bg-gradient-to-b from-[#2c2c2c] to-[#003d2e] md:rounded-[2rem]  mb-4 border-[#046C59] border-[0.5px] h-[82.3vh] md:h-[60vh]">
                   <img
                     src="/gk_image.png" // Replace with your avatar image or avatar streaming component
                     alt="Avatar"
