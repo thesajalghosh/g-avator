@@ -487,7 +487,7 @@ export default function InteractiveAvatar() {
 
 
 
-  console.log("isLoadingAccessToken", messagesEndRef, messages)
+  // console.log("isLoadingAccessToken", messagesEndRef, messages)
   return (
     <>
       {/* {!isVideoPlaying && !isLoadingSession && (
@@ -506,19 +506,19 @@ export default function InteractiveAvatar() {
       )} */}
       {!isVideoPlaying && !isLoadingSession && (
         <div
-          className="absolute inset-0 flex items-center justify-center z-50 w-[100vw]  md:w-full lg:w-full"
+          className="absolute inset-0 flex items-center justify-center z-50 w-[100vw]  md:w-full lg:w-full overflow-hidden"
         >
 
-          <div className="min-h-screen bg-black text-white font-sans">
+          <div className="h=[75vh] bg-black text-white font-sans">
             {/* Header */}
             {/* Avatar Card */}
-            <div className="flex justify-center items-center w-[100%] lg:mt-20 md:mt-32">
-              <div className="bg-gradient-to-b from-gray-800 to-green-900 pb-4 md:rounded-[2rem] w-[100vw] h-[100vh] md:w-[300px]  md:h-full text-center">
-                <div className="pt-6 md:pt-0 bg-gradient-to-b from-[#2c2c2c] to-[#003d2e] md:rounded-[2rem]  mb-4 border-[#046C59] border-[0.5px] h-[82.3vh] md:h-[60vh]">
+            <div className="flex justify-center items-center w-[100%] mt-3 lg:mt-20 md:mt-32">
+              <div className="bg-gradient-to-b from-gray-800 to-green-900 pb-4 rounded-[1rem] md:rounded-[2rem] w-[95vw] h-[83vh] md:w-[300px]  md:h-full text-center">
+                <div className="pt-6 md:pt-0 bg-gradient-to-b from-[#2c2c2c] to-[#003d2e] rounded-[1rem] md:rounded-[2rem]  mb-4 border-[#046C59] border-[0.5px] h-[73vh] md:h-[60vh]">
                   <img
                     src="/gk_image.png" // Replace with your avatar image or avatar streaming component
                     alt="Avatar"
-                    className="rounded-[2rem] mx-auto h-[79vh] md:h-[60vh]"
+                    className="rounded-[2rem] mx-auto h-[60vh] md:h-[60vh]"
                   />
                 </div>
                 {/* <button 
@@ -533,9 +533,9 @@ export default function InteractiveAvatar() {
           </button> */}
                 <button
                   className="bg-emerald-600 hover:bg-emerald-700 text-white
-                   px-6 py-3 rounded-md font-semibold mt-4
-                    md:mt-0 md:relative fixed bottom-4
-                     left-1/2 md:left-16 transform -translate-x-1/2 w-[90%] md:w-auto
+                   px-6 py-3 rounded-md font-semibold
+                    mt-4 relative bottom-4
+                       w-[90%]
                      md:mt-4"
                   onClick={async () => {
                     await startSession();
